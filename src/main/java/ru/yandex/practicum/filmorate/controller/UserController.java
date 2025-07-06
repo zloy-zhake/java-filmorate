@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
@@ -13,10 +15,14 @@ import java.util.*;
 @Slf4j
 public class UserController {
     private Map<Integer, User> users = new HashMap<>();
+    @Getter
+    @Setter
+    private int currentId = 0;
 
     @PostMapping
     public User createUser(@RequestBody User newUser) {
         User validatedUser = this.validateUser(newUser);
+        newUser.setId(this.getNextId());
         this.users.put(validatedUser.getId(), validatedUser);
         log.info("Создан пользователь: {}", newUser);
         return validatedUser;
@@ -36,6 +42,12 @@ public class UserController {
     @GetMapping
     public List<User> getAllUsers() {
         return new ArrayList<>(this.users.values());
+    }
+
+    private int getNextId() {
+        int nextId = this.getCurrentId() + 1;
+        this.setCurrentId(nextId);
+        return nextId;
     }
 
     // Метод возвращает объект User, потому что в процессе валидации объект может измениться

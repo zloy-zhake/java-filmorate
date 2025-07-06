@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
@@ -13,17 +15,21 @@ import java.util.*;
 @Slf4j
 public class FilmController {
     private Map<Integer, Film> films = new HashMap<>();
+    @Getter
+    @Setter
+    private int currentId = 0;
 
     @PostMapping
     public Film addFilm(@RequestBody Film newFilm){
         this.validateFilm(newFilm);
+        newFilm.setId(this.getNextId());
         this.films.put(newFilm.getId(), newFilm);
         log.info("Добавлен фильм: {}", newFilm);
         return newFilm;
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody int filmId, @RequestBody Film updatedFilm){
+    public Film updateFilm(@RequestBody Film updatedFilm){
         if (!this.films.containsKey(updatedFilm.getId())) {
             throw new NoSuchElementException("Фильма с id=" + updatedFilm.getId() + " нет в системе.");
         }
@@ -36,6 +42,12 @@ public class FilmController {
     @GetMapping
     public List<Film> getAllFilms() {
         return new ArrayList<>(this.films.values());
+    }
+
+    private int getNextId() {
+        int nextId = this.getCurrentId() + 1;
+        this.setCurrentId(nextId);
+        return nextId;
     }
 
     private void validateFilm(Film film) throws FilmValidationException {
@@ -52,7 +64,7 @@ public class FilmController {
             log.error("Указана нереалистичная дата релиза. {}", film);
             throw new FilmValidationException("Дата релиза не может быть раньше 28 декабря 1895 года.");
         }
-        if (film.getDuration().toSeconds() < 0) {
+        if (film.getDuration() < 0) {
             log.error("Указана нереалистичная продолжительность фильма. {}", film);
             throw new FilmValidationException("Продолжительность фильма должна быть положительным числом.");
         }
