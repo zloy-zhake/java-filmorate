@@ -14,13 +14,13 @@ import java.util.*;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
     @Getter
     @Setter
     private int currentId = 0;
 
     @PostMapping
-    public Film addFilm(@RequestBody Film newFilm){
+    public Film addFilm(@RequestBody Film newFilm) {
         this.validateFilm(newFilm);
         newFilm.setId(this.getNextId());
         this.films.put(newFilm.getId(), newFilm);
@@ -29,7 +29,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film updatedFilm){
+    public Film updateFilm(@RequestBody Film updatedFilm) {
         if (!this.films.containsKey(updatedFilm.getId())) {
             throw new NoSuchElementException("Фильма с id=" + updatedFilm.getId() + " нет в системе.");
         }

@@ -15,7 +15,7 @@ public class UserValidationTests {
     User testUser;
 
     @BeforeEach
-    void setUp() throws NoSuchMethodException {
+    void setUp() {
         uc = new UserController();
         testUser = new User();
         testUser.setId(1);
@@ -31,7 +31,7 @@ public class UserValidationTests {
     }
 
     @Test
-    void testNoEmail(){
+    void testNoEmail() {
         testUser.setEmail("");
         assertThrows(UserValidationException.class, () -> uc.createUser(testUser));
     }
@@ -57,7 +57,7 @@ public class UserValidationTests {
     @Test
     void testNoName() {
         testUser.setName("");
-        User createdUser =  uc.createUser(testUser);
+        User createdUser = uc.createUser(testUser);
         assertEquals(createdUser.getName(), createdUser.getLogin());
     }
 

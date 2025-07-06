@@ -2,21 +2,21 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class FilmValidationTests {
     FilmController fc;
     Film testFilm;
 
     @BeforeEach
-    void setUp() throws NoSuchMethodException {
+    void setUp() {
         fc = new FilmController();
         testFilm = new Film();
         testFilm.setId(1);
@@ -32,7 +32,7 @@ public class FilmValidationTests {
     }
 
     @Test
-    void testNoName(){
+    void testNoName() {
         testFilm.setName("");
         assertThrows(FilmValidationException.class, () -> fc.addFilm(testFilm));
     }
