@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,7 @@ public class UserController {
     private int currentId = 0;
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User newUser) {
+    public User createUser(@RequestBody User newUser) {
         User validatedUser = this.validateUser(newUser);
         newUser.setId(this.getNextId());
         this.users.put(validatedUser.getId(), validatedUser);
@@ -30,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User updatedUser) {
+    public User updateUser(@RequestBody User updatedUser) {
         if (!this.users.containsKey(updatedUser.getId())) {
             throw new NoSuchElementException("Пользователя с id=" + updatedUser.getId() + " нет в системе.");
         }
