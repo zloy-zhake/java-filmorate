@@ -1,82 +1,61 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    @Getter
-    @Setter
-    private int currentId = 0;
+    private final UserStorage userStorage;
+    private final UserService userService;
 
-    @PostMapping
-    public User createUser(@RequestBody User newUser) {
-        User validatedUser = this.validateUser(newUser);
-        newUser.setId(this.getNextId());
-        this.users.put(validatedUser.getId(), validatedUser);
-        log.info("Создан пользователь: {}", newUser);
-        return validatedUser;
-    }
-
-    @PutMapping
-    public User updateUser(@RequestBody User updatedUser) {
-        if (!this.users.containsKey(updatedUser.getId())) {
-            throw new NoSuchElementException("Пользователя с id=" + updatedUser.getId() + " нет в системе.");
-        }
-        User validatedUser = this.validateUser(updatedUser);
-        this.users.put(validatedUser.getId(), validatedUser);
-        log.info("Обновлены данные о пользователе: {}", updatedUser);
-        return validatedUser;
+    public UserController(UserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
+        this.userService = userService;
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<User> getAllUsers() {
-        return new ArrayList<>(this.users.values());
+        return this.userStorage.getAllUsers();
     }
 
-    private int getNextId() {
-        int nextId = this.getCurrentId() + 1;
-        this.setCurrentId(nextId);
-        return nextId;
-    }
-
-    // Метод возвращает объект User, потому что в процессе валидации объект может измениться
-    private User validateUser(User user) throws UserValidationException {
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            log.error("Отсутствует адрес электронной почты. {}", user);
-            throw new UserValidationException("Электронная почта не может быть пустой.");
-        }
-        if (!user.getEmail().contains("@")) {
-            log.error("Адрес электронной почты не содержит \"@\". {}", user);
-            throw new UserValidationException("Электронная почта должна содержать символ @.");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            log.error("Отсутствует логин. {}", user);
-            throw new UserValidationException("Логин не может быть пустым.");
-        }
-        if (user.getLogin().contains(" ")) {
-            log.error("Логин содержит пробелы. {}", user);
-            throw new UserValidationException("Логин не может содержать пробелы.");
-        }
-        // имя для отображения может быть пустым — в таком случае будет использован логин
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-            log.info("Отсутствует имя для отображения. Вместо него будет использован логин.");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Указана нереалистичная дата рождения. {}", user);
-            throw new UserValidationException("Дата рождения не может быть в будущем.");
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public User getUserById(@PathVariable int id) {
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Пользователь с указанным id не найден."
+            );
         }
         return user;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@RequestBody User newUser) {
+        return this.userStorage.createUser(newUser);
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUser(@RequestBody User updatedUser) {
+        return this.userStorage.updateUser(updatedUser);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addFriends(@PathVariable int id, @PathVariable int friendId) {
+        this.userService.addFriends(id, friendId);
     }
 }

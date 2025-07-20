@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -12,12 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FilmValidationTests {
+    FilmStorage fs;
     FilmController fc;
     Film testFilm;
 
     @BeforeEach
     void setUp() {
-        fc = new FilmController();
+        fs = new InMemoryFilmStorage();
+        fc = new FilmController(fs);
         testFilm = new Film();
         testFilm.setId(1);
         testFilm.setName("Name");
