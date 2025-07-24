@@ -19,24 +19,27 @@ public class UserService {
     public void addFriends(int user1Id, int user2Id) {
         // Пока пользователям не надо одобрять заявки в друзья — добавляем сразу.
         // То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены.
-        User user1 = userStorage.getUserById(user1Id);
-        User user2 = userStorage.getUserById(user2Id);
+        User user1 = this.userStorage.getUserById(user1Id);
+        User user2 = this.userStorage.getUserById(user2Id);
         user1.addFriend(user2);
         user2.addFriend(user1);
     }
 
-    public void removeFriend(User user1, User user2) {
-        if (user1 == null || user2 == null) {
-            throw new UserValidationException("Пользователь не может быть null.");
-        }
+    public void removeFriends(int user1Id, int user2Id) {
+        User user1 = this.userStorage.getUserById(user1Id);
+        User user2 = this.userStorage.getUserById(user2Id);
         user1.removeFriend(user2);
         user2.removeFriend(user1);
     }
 
-    public List<User> listCommonFriends(User user1, User user2) {
-        Set<User> friendsOfUser1 = user1.getFriends();
-        Set<User> friendsOfUser2 = user2.getFriends();
+    public List<User> listCommonFriends(int user1Id, int user2Id) {
+        Set<User> friendsOfUser1 = this.userStorage.getUserById(user1Id).getFriends();
+        Set<User> friendsOfUser2 = this.userStorage.getUserById(user2Id).getFriends();
         friendsOfUser1.retainAll(friendsOfUser2);
         return friendsOfUser1.stream().toList();
+    }
+
+    public List<User> getUserFriends(int id) {
+        return this.userStorage.getUserById(id).getFriends().stream().toList();
     }
 }

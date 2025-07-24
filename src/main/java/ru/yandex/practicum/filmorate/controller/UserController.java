@@ -31,14 +31,19 @@ public class UserController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUserById(@PathVariable int id) {
-        User user = userStorage.getUserById(id);
-        if (user == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Пользователь с указанным id не найден."
-            );
-        }
-        return user;
+        return this.userStorage.getUserById(id);
+    }
+
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getUserFriends(@PathVariable int id) {
+        return this.userService.getUserFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return this.userService.listCommonFriends(id, otherId);
     }
 
     @PostMapping
@@ -57,5 +62,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void addFriends(@PathVariable int id, @PathVariable int friendId) {
         this.userService.addFriends(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFriends(@PathVariable int id, @PathVariable int friendId) {
+        this.userService.removeFriends(id, friendId);
     }
 }
