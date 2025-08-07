@@ -1,5 +1,4 @@
-spring:
-  logging.level.org.zalando.logbook: TRACE
+logging.level.org.zalando.logbook: TRACE
 
 filmorate:
   default-number-of-top-films: 10

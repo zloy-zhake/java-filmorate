@@ -24,7 +24,7 @@ public class UserValidationTests {
         userStorage = new InMemoryUserStorage();
         userService = new UserService(userStorage);
         userController = new UserController(userStorage, userService);
-        testUser = new User();
+        testUser = new User(0, "", "", "", LocalDate.of(2000, 1, 1));
         testUser.setId(1);
         testUser.setEmail("name@email.com");
         testUser.setLogin("login");

@@ -33,10 +33,10 @@ public class FilmController {
         return this.filmStorage.getFilmById(id);
     }
 
-    @GetMapping("/popular?count={count}")
+    @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public List<Film> getTopLikedFilms(@PathVariable(required = false) Integer count) {
-      return this.filmService.getTopLikedFilms(count);
+    public List<Film> getTopLikedFilms(@RequestParam(required = false) int count) {
+        return this.filmService.getTopLikedFilms(count);
     }
 
     @PostMapping

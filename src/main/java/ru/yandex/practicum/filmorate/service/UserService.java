@@ -32,13 +32,17 @@ public class UserService {
     }
 
     public List<User> listCommonFriends(int user1Id, int user2Id) {
-        Set<User> friendsOfUser1 = this.userStorage.getUserById(user1Id).getFriends();
-        Set<User> friendsOfUser2 = this.userStorage.getUserById(user2Id).getFriends();
+        Set<Integer> friendsOfUser1 = this.userStorage.getUserById(user1Id).getFriendIds();
+        Set<Integer> friendsOfUser2 = this.userStorage.getUserById(user2Id).getFriendIds();
         friendsOfUser1.retainAll(friendsOfUser2);
-        return friendsOfUser1.stream().toList();
+        return friendsOfUser1.stream()
+                .map(userId -> this.userStorage.getUserById(userId))
+                .toList();
     }
 
     public List<User> getUserFriends(int id) {
-        return this.userStorage.getUserById(id).getFriends().stream().toList();
+        return this.userStorage.getUserById(id).getFriendIds().stream()
+                .map(userId -> this.userStorage.getUserById(userId))
+                .toList();
     }
 }
