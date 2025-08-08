@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -13,24 +12,22 @@ import java.util.List;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final UserStorage userStorage;
     private final UserService userService;
 
-    public UserController(UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<User> getAllUsers() {
-        return this.userStorage.getAllUsers();
+        return this.userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUserById(@PathVariable int id) {
-        return this.userStorage.getUserById(id);
+        return this.userService.getUserById(id);
     }
 
     @GetMapping("/{id}/friends")
@@ -48,13 +45,13 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User newUser) {
-        return this.userStorage.createUser(newUser);
+        return this.userService.createUser(newUser);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@RequestBody User updatedUser) {
-        return this.userStorage.updateUser(updatedUser);
+        return this.userService.updateUser(updatedUser);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

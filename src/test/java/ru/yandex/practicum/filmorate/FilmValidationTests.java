@@ -28,7 +28,7 @@ public class FilmValidationTests {
     void setUp() {
         filmStorage = new InMemoryFilmStorage();
         filmService = new FilmService(appConfig, filmStorage, userStorage);
-        filmController = new FilmController(filmStorage, filmService);
+        filmController = new FilmController(filmService);
         testFilm = new Film(0, "", "", LocalDate.of(2000, 1, 1), 0);
         testFilm.setId(1);
         testFilm.setName("Name");

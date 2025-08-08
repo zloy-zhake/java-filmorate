@@ -23,6 +23,22 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    public List<Film> getAllFilms() {
+        return this.filmStorage.getAllFilms();
+    }
+
+    public Film getFilmById(int id) {
+        return this.filmStorage.getFilmById(id);
+    }
+
+    public Film addFilm(Film newFilm) {
+        return this.filmStorage.addFilm(newFilm);
+    }
+
+    public Film updateFilm(Film updatedFilm) {
+        return this.filmStorage.updateFilm(updatedFilm);
+    }
+
     public void addLike(int userId, int filmId) {
         User user = this.userStorage.getUserById(userId);
         Film film = this.filmStorage.getFilmById(filmId);

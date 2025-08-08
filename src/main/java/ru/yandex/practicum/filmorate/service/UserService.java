@@ -15,6 +15,22 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public List<User> getAllUsers() {
+        return this.userStorage.getAllUsers();
+    }
+
+    public User getUserById(int id) {
+        return this.userStorage.getUserById(id);
+    }
+
+    public User createUser(User newUser) {
+        return this.userStorage.createUser(newUser);
+    }
+
+    public User updateUser(User updatedUser) {
+        return this.userStorage.updateUser(updatedUser);
+    }
+
     public void addFriends(int user1Id, int user2Id) {
         // Пока пользователям не надо одобрять заявки в друзья — добавляем сразу.
         // То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены.
