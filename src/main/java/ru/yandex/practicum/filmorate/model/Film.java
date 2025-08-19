@@ -17,7 +17,10 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private Set<User> usersWhoLiked;
+    private Set<String> genres;
+    private MpaRating mpaRating;
 
+    // FIXME Попробуй конструктор без параметров
     public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
         this.id = id;
         this.name = name;
