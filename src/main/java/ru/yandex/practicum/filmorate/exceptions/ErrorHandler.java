@@ -28,4 +28,21 @@ public class ErrorHandler {
         return new ErrorResponse("Данные отсутствуют", e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleRecordCreationException(final RecordCreationException e) {
+        return new ErrorResponse("Данные не записаны в базу данных", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleRecordUpdateException(final RecordUpdateException e) {
+        return new ErrorResponse("Ошибка обновления данных", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDuplicatedDataException(final DuplicatedDataException e) {
+        return new ErrorResponse("Ошибка дублирования данных", e.getMessage());
+    }
 }

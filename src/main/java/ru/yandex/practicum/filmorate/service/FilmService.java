@@ -44,15 +44,15 @@ public class FilmService {
     }
 
     public void addLike(int userId, int filmId) {
-        User user = this.userStorage.getUserById(userId);
-        Film film = this.filmStorage.getFilmById(filmId);
-        film.addLike(user);
+//        User user = this.userStorage.getUserById(userId);
+//        Film film = this.filmStorage.getFilmById(filmId);
+//        film.addLike(user);
     }
 
     public void removeLike(int userId, int filmId) {
-        User user = this.userStorage.getUserById(userId);
-        Film film = this.filmStorage.getFilmById(filmId);
-        film.removeLike(user);
+//        User user = this.userStorage.getUserById(userId);
+//        Film film = this.filmStorage.getFilmById(filmId);
+//        film.removeLike(user);
     }
 
     public List<Film> getTopLikedFilms(Integer count) {

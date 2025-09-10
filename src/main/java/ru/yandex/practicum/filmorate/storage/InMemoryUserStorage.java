@@ -41,12 +41,22 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(this.users.values());
     }
 
-    public User getUserById(int id) throws NoSuchElementException {
+    public Optional<User> getUserById(int id) throws NoSuchElementException {
         User user = this.users.get(id);
         if (user == null) {
             throw new NoSuchElementException("Пользователя с id=" + id + " не существует");
         }
-        return user;
+        return Optional.of(user);
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> getUserByLogin(String login) {
+        return Optional.empty();
     }
 
     private int getNextId() {

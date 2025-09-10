@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -23,6 +25,18 @@ public class UserController {
         return this.userService.getAllUsers();
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto createUser(@RequestBody NewUserRequest newUserRequest) {
+        return this.userService.createUser(newUserRequest);
+    }
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto updateUser(@RequestBody UpdateUserRequest request) {
+        return this.userService.updateUser(request);
+    }
+
 //    @GetMapping("/{id}")
 //    @ResponseStatus(HttpStatus.OK)
 //    public User getUserById(@PathVariable int id) {
@@ -39,18 +53,6 @@ public class UserController {
 //    @ResponseStatus(HttpStatus.OK)
 //    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
 //        return this.userService.listCommonFriends(id, otherId);
-//    }
-//
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public User createUser(@RequestBody User newUser) {
-//        return this.userService.createUser(newUser);
-//    }
-//
-//    @PutMapping
-//    @ResponseStatus(HttpStatus.OK)
-//    public User updateUser(@RequestBody User updatedUser) {
-//        return this.userService.updateUser(updatedUser);
 //    }
 //
 //    @PutMapping("/{id}/friends/{friendId}")
