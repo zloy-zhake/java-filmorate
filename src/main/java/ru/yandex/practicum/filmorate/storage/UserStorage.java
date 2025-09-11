@@ -17,4 +17,8 @@ public interface UserStorage {
     Optional<User> getUserByEmail(String email);
 
     Optional<User> getUserByLogin(String login);
+
+    void addFriend(int user1id, int user2id);
+
+    List<Integer> getUserFriends(int userId);
 }

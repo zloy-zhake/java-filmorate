@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS friendships (
   friendFrom integer NOT NULL,
   friendTo integer NOT NULL,
-  acceptanceStatus bool DEFAULT false,
+  acceptanceStatus varchar DEFAULT false,
   PRIMARY KEY (friendFrom, friendTo)
 );
 

@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,10 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     private static final String GET_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
     private static final String GET_BY_LOGIN_QUERY = "SELECT * FROM users WHERE login = ?";
+    private static final String GET_FRENDFROM_QUERY =
+            "SELECT friendFrom, acceptanceStatus FROM friendships WHERE friendTo = ?";
+    private static final String GET_FRENDTO_QUERY =
+            "SELECT friendTo, acceptanceStatus FROM friendships WHERE friendFrom = ?";
     private static final String UPDATE_QUERY =
             "UPDATE users " +
                     "SET email = ?, login = ?, name = ?, birthday = ? " +
@@ -21,6 +28,15 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     private static final String INSERT_QUERY =
             "INSERT INTO users(email, login, name, birthday)" +
                     "VALUES (?, ?, ?, ?)";
+    private static final String ADD_FRIEND_QUERY =
+            "INSERT into friendships(friendFrom, friendTo, acceptanceStatus) " +
+                    "VALUES (?, ?, ?)";
+    private static final String GET_USER_FRIENDS_QUERY =
+            "SELECT friendTo as friend FROM friendships " +
+                    "WHERE friendFrom = ? AND acceptanceStatus = 'CONFIRMED' " +
+                    "UNION " +
+                    "SELECT friendFrom as friend FROM friendships " +
+                    "WHERE friendTo = ? AND acceptanceStatus = 'CONFIRMED'";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -33,7 +49,32 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
 
     @Override
     public Optional<User> getUserById(int id) {
-        return findOne(GET_BY_ID_QUERY, id);
+        Optional<User> optUser = findOne(GET_BY_ID_QUERY, id);
+        if (optUser.isEmpty()) {
+            return optUser;
+        }
+        HashMap<Integer, FriendshipStatus> friendships = new HashMap<>();
+        jdbc.query(GET_FRENDFROM_QUERY,
+                (rs) -> {
+                    int friendFrom = rs.getInt("friendFrom");
+                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
+                            rs.getString("acceptanceStatus")
+                    );
+                    friendships.put(friendFrom, acceptanceStatus);
+                },
+                id);
+        jdbc.query(GET_FRENDTO_QUERY,
+                (rs) -> {
+                    int friendFrom = rs.getInt("friendFrom");
+                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
+                            rs.getString("acceptanceStatus"));
+                    friendships.put(friendFrom, acceptanceStatus);
+                },
+                id);
+        User user = optUser.get();
+        user.setFriendIds(friendships.keySet());
+        user.setFriendshipStatuses(friendships);
+        return Optional.of(user);
     }
 
     @Override
@@ -70,5 +111,18 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
                 user.getId()
         );
         return user;
+    }
+
+    @Override
+    public void addFriend(int user1Id, int user2Id) {
+        insertWithoutGeneratedId(ADD_FRIEND_QUERY, user1Id, user2Id, FriendshipStatus.UNCONFIRMED.toString());
+    }
+
+    @Override
+    public List<Integer> getUserFriends(int userId) {
+        List<Integer> friends = jdbc.queryForList(GET_USER_FRIENDS_QUERY, Integer.class, userId, userId);
+        return friends.stream()
+                .distinct()
+                .toList();
     }
 }

@@ -42,6 +42,15 @@ public class BaseBdStorage<T> {
         }
     }
 
+    protected void insertWithoutGeneratedId(String query, Object... params) {
+        int rowsUpdated = jdbc.update(query, params);
+        if (rowsUpdated == 0) {
+            throw new RecordUpdateException("Не удалось записать данные в БД. "
+                    + "Запрос: " + query
+                    + "Параметры: " + Arrays.toString(params));
+        }
+    }
+
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
         if (rowsUpdated == 0) {

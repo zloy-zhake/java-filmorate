@@ -25,6 +25,12 @@ public class UserController {
         return this.userService.getAllUsers();
     }
 
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Integer> getUserFriends(@PathVariable int id) {
+        return this.userService.getUserFriends(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@RequestBody NewUserRequest newUserRequest) {
@@ -37,28 +43,23 @@ public class UserController {
         return this.userService.updateUser(request);
     }
 
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addFriends(@PathVariable int id, @PathVariable int friendId) {
+        this.userService.addFriends(id, friendId);
+    }
+
 //    @GetMapping("/{id}")
 //    @ResponseStatus(HttpStatus.OK)
 //    public User getUserById(@PathVariable int id) {
 //        return this.userService.getUserById(id);
 //    }
 //
-//    @GetMapping("/{id}/friends")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<User> getUserFriends(@PathVariable int id) {
-//        return this.userService.getUserFriends(id);
-//    }
 //
 //    @GetMapping("/{id}/friends/common/{otherId}")
 //    @ResponseStatus(HttpStatus.OK)
 //    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
 //        return this.userService.listCommonFriends(id, otherId);
-//    }
-//
-//    @PutMapping("/{id}/friends/{friendId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void addFriends(@PathVariable int id, @PathVariable int friendId) {
-//        this.userService.addFriends(id, friendId);
 //    }
 //
 //    @DeleteMapping("/{id}/friends/{friendId}")

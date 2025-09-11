@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
@@ -62,17 +61,35 @@ public class UserService {
         return UserMapper.mapToUserDto(updatedUser);
     }
 
-//    public User getUserById(int id) {
+    public void addFriends(int user1Id, int user2Id) {
+        // проверить есть ли дружба user1 -> user2
+        // проверить есть ли дружба user2 -> user1
+        // если их нет, добавить
+        Optional<User> optUser1 = this.userStorage.getUserById(user1Id);
+        Optional<User> optUser2 = this.userStorage.getUserById(user2Id);
+        if (optUser1.isPresent()) {
+            User user1 = optUser1.get();
+        } else {
+            throw new NoSuchElementException(
+                    "Пользователя с id=" + user1Id + " нет в системе."
+            );
+        }
+        if (optUser2.isPresent()) {
+            User user2 = optUser2.get();
+        } else {
+            throw new NoSuchElementException(
+                    "Пользователя с id=" + user2Id + " нет в системе."
+            );
+        }
+        this.userStorage.addFriend(user1Id, user2Id);
+    }
+
+    public List<Integer> getUserFriends(int userId) {
+        return this.userStorage.getUserFriends(userId);
+    }
+
+    //    public User getUserById(int id) {
 //        return this.userStorage.getUserById(id);
-//    }
-//
-//    public void addFriends(int user1Id, int user2Id) {
-//        // Пока пользователям не надо одобрять заявки в друзья — добавляем сразу.
-//        // То есть если Лена стала другом Саши, то это значит, что Саша теперь друг Лены.
-//        User user1 = this.userStorage.getUserById(user1Id);
-//        User user2 = this.userStorage.getUserById(user2Id);
-//        user1.addFriend(user2);
-//        user2.addFriend(user1);
 //    }
 //
 //    public void removeFriends(int user1Id, int user2Id) {
@@ -91,12 +108,6 @@ public class UserService {
 //                .toList();
 //    }
 //
-//    public List<User> getUserFriends(int id) {
-//        return this.userStorage.getUserById(id).getFriendIds().stream()
-//                .map(userId -> this.userStorage.getUserById(userId))
-//                .toList();
-//    }
-
     // Метод возвращает объект User, потому что в процессе валидации объект может измениться
     private NewUserRequest validateNewUserRequest(NewUserRequest request) throws UserValidationException {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
