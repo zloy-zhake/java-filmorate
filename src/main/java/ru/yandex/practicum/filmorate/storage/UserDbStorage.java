@@ -6,10 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
@@ -17,10 +15,10 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     private static final String GET_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
     private static final String GET_BY_LOGIN_QUERY = "SELECT * FROM users WHERE login = ?";
-    private static final String GET_FRENDFROM_QUERY =
-            "SELECT friendFrom, acceptanceStatus FROM friendships WHERE friendTo = ?";
-    private static final String GET_FRENDTO_QUERY =
-            "SELECT friendTo, acceptanceStatus FROM friendships WHERE friendFrom = ?";
+//    private static final String GET_FRENDFROM_QUERY =
+//            "SELECT friendFrom, acceptanceStatus FROM friendships WHERE friendTo = ?";
+//    private static final String GET_FRENDTO_QUERY =
+//            "SELECT friendTo, acceptanceStatus FROM friendships WHERE friendFrom = ?";
     private static final String UPDATE_QUERY =
             "UPDATE users " +
                     "SET email = ?, login = ?, name = ?, birthday = ? " +
@@ -32,11 +30,8 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
             "INSERT into friendships(friendFrom, friendTo, acceptanceStatus) " +
                     "VALUES (?, ?, ?)";
     private static final String GET_USER_FRIENDS_QUERY =
-            "SELECT friendTo as friend FROM friendships " +
-                    "WHERE friendFrom = ? AND acceptanceStatus = 'CONFIRMED' " +
-                    "UNION " +
-                    "SELECT friendFrom as friend FROM friendships " +
-                    "WHERE friendTo = ? AND acceptanceStatus = 'CONFIRMED'";
+            "SELECT friendTo FROM friendships " +
+                    "WHERE friendFrom = ?";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -44,7 +39,9 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
 
     @Override
     public List<User> getAllUsers() {
-        return findMany(GET_ALL_QUERY);
+        return findMany(GET_ALL_QUERY).stream()
+                .peek(user -> user.setFriends(getUserFriends(user.getId())))
+                .toList();
     }
 
     @Override
@@ -53,27 +50,27 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
         if (optUser.isEmpty()) {
             return optUser;
         }
-        HashMap<Integer, FriendshipStatus> friendships = new HashMap<>();
-        jdbc.query(GET_FRENDFROM_QUERY,
-                (rs) -> {
-                    int friendFrom = rs.getInt("friendFrom");
-                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
-                            rs.getString("acceptanceStatus")
-                    );
-                    friendships.put(friendFrom, acceptanceStatus);
-                },
-                id);
-        jdbc.query(GET_FRENDTO_QUERY,
-                (rs) -> {
-                    int friendFrom = rs.getInt("friendFrom");
-                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
-                            rs.getString("acceptanceStatus"));
-                    friendships.put(friendFrom, acceptanceStatus);
-                },
-                id);
+//        HashMap<Integer, FriendshipStatus> friendships = new HashMap<>();
+//        jdbc.query(GET_FRENDFROM_QUERY,
+//                (rs) -> {
+//                    int friendFrom = rs.getInt("friendFrom");
+//                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
+//                            rs.getString("acceptanceStatus")
+//                    );
+//                    friendships.put(friendFrom, acceptanceStatus);
+//                },
+//                id);
+//        jdbc.query(GET_FRENDTO_QUERY,
+//                (rs) -> {
+//                    int friendFrom = rs.getInt("friendFrom");
+//                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
+//                            rs.getString("acceptanceStatus"));
+//                    friendships.put(friendFrom, acceptanceStatus);
+//                },
+//                id);
         User user = optUser.get();
-        user.setFriendIds(friendships.keySet());
-        user.setFriendshipStatuses(friendships);
+        user.setFriends(this.getUserFriends(user.getId()));
+//        user.setFriendshipStatuses(friendships);
         return Optional.of(user);
     }
 
@@ -119,10 +116,8 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     }
 
     @Override
-    public List<Integer> getUserFriends(int userId) {
-        List<Integer> friends = jdbc.queryForList(GET_USER_FRIENDS_QUERY, Integer.class, userId, userId);
-        return friends.stream()
-                .distinct()
-                .toList();
+    public List<User> getUserFriends(int userId) {
+        List<Integer> friendIds = jdbc.queryForList(GET_USER_FRIENDS_QUERY, Integer.class, userId);
+        return friendIds.stream().map(id -> getUserById(id).get()).toList();
     }
 }

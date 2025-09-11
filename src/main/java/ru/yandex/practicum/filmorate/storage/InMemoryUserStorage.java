@@ -63,7 +63,7 @@ public class InMemoryUserStorage implements UserStorage {
     public void addFriend(int user1id, int user2id) { }
 
     @Override
-    public List<Integer> getUserFriends(int userId) {
+    public List<User> getUserFriends(int userId) {
         return new ArrayList<>();
     }
 

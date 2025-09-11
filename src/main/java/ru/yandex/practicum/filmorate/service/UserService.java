@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,21 +63,14 @@ public class UserService {
     }
 
     public void addFriends(int user1Id, int user2Id) {
-        // проверить есть ли дружба user1 -> user2
-        // проверить есть ли дружба user2 -> user1
-        // если их нет, добавить
         Optional<User> optUser1 = this.userStorage.getUserById(user1Id);
         Optional<User> optUser2 = this.userStorage.getUserById(user2Id);
-        if (optUser1.isPresent()) {
-            User user1 = optUser1.get();
-        } else {
+        if (optUser1.isEmpty()) {
             throw new NoSuchElementException(
                     "Пользователя с id=" + user1Id + " нет в системе."
             );
         }
-        if (optUser2.isPresent()) {
-            User user2 = optUser2.get();
-        } else {
+        if (optUser2.isEmpty()) {
             throw new NoSuchElementException(
                     "Пользователя с id=" + user2Id + " нет в системе."
             );
@@ -84,8 +78,16 @@ public class UserService {
         this.userStorage.addFriend(user1Id, user2Id);
     }
 
-    public List<Integer> getUserFriends(int userId) {
-        return this.userStorage.getUserFriends(userId);
+    public List<UserDto> getUserFriends(int userId) {
+        Optional<User> optUser = this.userStorage.getUserById(userId);
+        if (optUser.isEmpty()) {
+            throw new NoSuchElementException(
+                    "Пользователя с id=" + userId + " нет в системе."
+            );
+        }
+        return this.userStorage.getUserFriends(userId).stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
     }
 
     //    public User getUserById(int id) {

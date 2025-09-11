@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
-    public List<Integer> getUserFriends(@PathVariable int id) {
+    public List<UserDto> getUserFriends(@PathVariable int id) {
         return this.userService.getUserFriends(id);
     }
 

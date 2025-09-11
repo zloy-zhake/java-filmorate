@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,8 +18,8 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Integer> friendIds;
-    private Map<Integer, FriendshipStatus> friendshipStatuses;
+    private List<User> friends;
+//    private Map<Integer, FriendshipStatus> friendshipStatuses;
 
     // FIXME Попробуй конструктор без параметров
 //    public User(int id, String email, String login, String name, LocalDate birthday) {
