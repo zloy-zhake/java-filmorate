@@ -32,6 +32,12 @@ public class UserController {
         return this.userService.getUserFriends(id);
     }
 
+    @GetMapping("/{id}/friends/common/{otherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDto> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        return this.userService.getCommonFriends(id, otherId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@RequestBody NewUserRequest newUserRequest) {
@@ -50,22 +56,15 @@ public class UserController {
         this.userService.addFriends(id, friendId);
     }
 
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        this.userService.removeFriend(id, friendId);
+    }
+
 //    @GetMapping("/{id}")
 //    @ResponseStatus(HttpStatus.OK)
 //    public User getUserById(@PathVariable int id) {
 //        return this.userService.getUserById(id);
-//    }
-//
-//
-//    @GetMapping("/{id}/friends/common/{otherId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-//        return this.userService.listCommonFriends(id, otherId);
-//    }
-//
-//    @DeleteMapping("/{id}/friends/{friendId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void removeFriends(@PathVariable int id, @PathVariable int friendId) {
-//        this.userService.removeFriends(id, friendId);
 //    }
 }

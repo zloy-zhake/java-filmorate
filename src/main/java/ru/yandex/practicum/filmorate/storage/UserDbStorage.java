@@ -32,6 +32,10 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     private static final String GET_USER_FRIENDS_QUERY =
             "SELECT friendTo FROM friendships " +
                     "WHERE friendFrom = ?";
+    private static final String REMOVE_FRIEND_QUERY =
+            "DELETE FROM friendships " +
+                    "WHERE friendFrom = ? " +
+                    "AND friendTo = ?";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -119,5 +123,10 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     public List<User> getUserFriends(int userId) {
         List<Integer> friendIds = jdbc.queryForList(GET_USER_FRIENDS_QUERY, Integer.class, userId);
         return friendIds.stream().map(id -> getUserById(id).get()).toList();
+    }
+
+    @Override
+    public void removeFriend(int userId, int friendId) {
+        int rowsDeleted =  jdbc.update(REMOVE_FRIEND_QUERY, userId, friendId);
     }
 }

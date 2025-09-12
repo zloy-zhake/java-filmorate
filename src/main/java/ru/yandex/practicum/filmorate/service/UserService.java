@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,17 +34,17 @@ public class UserService {
     }
 
     public UserDto createUser(NewUserRequest request) {
-        request = this.validateNewUserRequest(request);
+        NewUserRequest validatedRequest = this.validateNewUserRequest(request);
 
-        Optional<User> userAlreadyExists = userStorage.getUserByEmail(request.getEmail());
+        Optional<User> userAlreadyExists = userStorage.getUserByEmail(validatedRequest.getEmail());
         if (userAlreadyExists.isPresent()) {
-            throw new DuplicatedDataException("Данный имейл уже используется: " + request.getEmail());
+            throw new DuplicatedDataException("Данный имейл уже используется: " + validatedRequest.getEmail());
         }
-        userAlreadyExists = userStorage.getUserByLogin(request.getLogin());
+        userAlreadyExists = userStorage.getUserByLogin(validatedRequest.getLogin());
         if (userAlreadyExists.isPresent()) {
-            throw new DuplicatedDataException("Данный логин уже используется: " + request.getLogin());
+            throw new DuplicatedDataException("Данный логин уже используется: " + validatedRequest.getLogin());
         }
-        User user = UserMapper.mapToUser(request);
+        User user = UserMapper.mapToUser(validatedRequest);
         user = userStorage.createUser(user);
         return UserMapper.mapToUserDto(user);
     }
@@ -63,14 +60,12 @@ public class UserService {
     }
 
     public void addFriends(int user1Id, int user2Id) {
-        Optional<User> optUser1 = this.userStorage.getUserById(user1Id);
-        Optional<User> optUser2 = this.userStorage.getUserById(user2Id);
-        if (optUser1.isEmpty()) {
+        if (!this.userExists(user1Id)) {
             throw new NoSuchElementException(
                     "Пользователя с id=" + user1Id + " нет в системе."
             );
         }
-        if (optUser2.isEmpty()) {
+        if (!this.userExists(user2Id)) {
             throw new NoSuchElementException(
                     "Пользователя с id=" + user2Id + " нет в системе."
             );
@@ -79,8 +74,7 @@ public class UserService {
     }
 
     public List<UserDto> getUserFriends(int userId) {
-        Optional<User> optUser = this.userStorage.getUserById(userId);
-        if (optUser.isEmpty()) {
+        if (!this.userExists(userId)) {
             throw new NoSuchElementException(
                     "Пользователя с id=" + userId + " нет в системе."
             );
@@ -90,26 +84,31 @@ public class UserService {
                 .toList();
     }
 
-    //    public User getUserById(int id) {
+    public void removeFriend(int userId, int friendId) {
+        if (!this.userExists(userId)) {
+            throw new NoSuchElementException(
+                    "Пользователя с id=" + userId + " нет в системе."
+            );
+        }
+        if (!this.userExists(friendId)) {
+            throw new NoSuchElementException(
+                    "Пользователя с id=" + friendId + " нет в системе."
+            );
+        }
+        userStorage.removeFriend(userId, friendId);
+    }
+
+    public List<UserDto> getCommonFriends(int user1Id, int user2Id) {
+        Set<UserDto> user1Friends = new HashSet<>(this.getUserFriends(user1Id));
+        Set<UserDto> user2Friends = new HashSet<>(this.getUserFriends(user2Id));
+        user1Friends.retainAll(user2Friends);
+        return new ArrayList<>(user1Friends);
+    }
+
+//    public User getUserById(int id) {
 //        return this.userStorage.getUserById(id);
 //    }
-//
-//    public void removeFriends(int user1Id, int user2Id) {
-//        User user1 = this.userStorage.getUserById(user1Id);
-//        User user2 = this.userStorage.getUserById(user2Id);
-//        user1.removeFriend(user2);
-//        user2.removeFriend(user1);
-//    }
-//
-//    public List<User> listCommonFriends(int user1Id, int user2Id) {
-//        Set<Integer> friendsOfUser1 = this.userStorage.getUserById(user1Id).getFriendIds();
-//        Set<Integer> friendsOfUser2 = this.userStorage.getUserById(user2Id).getFriendIds();
-//        friendsOfUser1.retainAll(friendsOfUser2);
-//        return friendsOfUser1.stream()
-//                .map(userId -> this.userStorage.getUserById(userId))
-//                .toList();
-//    }
-//
+
     // Метод возвращает объект User, потому что в процессе валидации объект может измениться
     private NewUserRequest validateNewUserRequest(NewUserRequest request) throws UserValidationException {
         if (request.getEmail() == null || request.getEmail().isBlank()) {
@@ -140,4 +139,8 @@ public class UserService {
         return request;
     }
 
+    private boolean userExists(int userId) {
+        Optional<User> optUser = this.userStorage.getUserById(userId);
+        return optUser.isPresent();
+    }
 }

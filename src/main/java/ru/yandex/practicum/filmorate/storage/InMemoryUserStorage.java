@@ -67,6 +67,9 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>();
     }
 
+    @Override
+    public void removeFriend(int userId, int friendId) {}
+
     private int getNextId() {
         int nextId = this.getCurrentId() + 1;
         this.setCurrentId(nextId);
