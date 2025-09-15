@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,12 +57,13 @@ public class FilmService {
     }
 
     public List<Film> getTopLikedFilms(Integer count) {
-        if (count == null) {
-            count = appConfig.getDefaultNumberOfTopFilms();
-        }
-        return filmStorage.getAllFilms().stream()
-                .sorted((f1, f2) -> f2.getNumberOfLikes() - f1.getNumberOfLikes())
-                .limit(count)
-                .toList();
+//        if (count == null) {
+//            count = appConfig.getDefaultNumberOfTopFilms();
+//        }
+//        return filmStorage.getAllFilms().stream()
+//                .sorted((f1, f2) -> f2.getNumberOfLikes() - f1.getNumberOfLikes())
+//                .limit(count)
+//                .toList();
+        return new ArrayList<>();
     }
 }

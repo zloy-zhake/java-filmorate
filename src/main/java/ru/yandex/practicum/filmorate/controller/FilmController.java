@@ -18,45 +18,44 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<Film> getAllFilms() {
-        return this.filmService.getAllFilms();
-    }
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Film getFilmById(@PathVariable int id) {
-        return this.filmService.getFilmById(id);
-    }
-
-    @GetMapping("/popular")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Film> getTopLikedFilms(@RequestParam(required = false) int count) {
-        return this.filmService.getTopLikedFilms(count);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@RequestBody Film newFilm) {
         return this.filmService.addFilm(newFilm);
     }
 
-    @PutMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Film updateFilm(@RequestBody Film updatedFilm) {
-        return this.filmService.updateFilm(updatedFilm);
-    }
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Film> getAllFilms() {
+//        return this.filmService.getAllFilms();
+//    }
 
-    @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void addLike(@PathVariable int userId, @PathVariable int id) {
-        this.filmService.addLike(userId, id);
-    }
+//    @GetMapping("/{id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Film getFilmById(@PathVariable int id) {
+//        return this.filmService.getFilmById(id);
+//    }
 
-    @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void removeLike(@PathVariable int userId, @PathVariable int id) {
-        this.filmService.removeLike(userId, id);
-    }
+//    @GetMapping("/popular")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Film> getTopLikedFilms(@RequestParam(required = false) int count) {
+//        return this.filmService.getTopLikedFilms(count);
+//    }
+
+//    @PutMapping
+//    @ResponseStatus(HttpStatus.OK)
+//    public Film updateFilm(@RequestBody Film updatedFilm) {
+//        return this.filmService.updateFilm(updatedFilm);
+//    }
+
+//    @PutMapping("/{id}/like/{userId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void addLike(@PathVariable int userId, @PathVariable int id) {
+//        this.filmService.addLike(userId, id);
+//    }
+
+//    @DeleteMapping("/{id}/like/{userId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void removeLike(@PathVariable int userId, @PathVariable int id) {
+//        this.filmService.removeLike(userId, id);
+//    }
 }

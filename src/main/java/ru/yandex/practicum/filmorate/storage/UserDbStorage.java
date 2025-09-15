@@ -54,27 +54,8 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
         if (optUser.isEmpty()) {
             return optUser;
         }
-//        HashMap<Integer, FriendshipStatus> friendships = new HashMap<>();
-//        jdbc.query(GET_FRENDFROM_QUERY,
-//                (rs) -> {
-//                    int friendFrom = rs.getInt("friendFrom");
-//                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
-//                            rs.getString("acceptanceStatus")
-//                    );
-//                    friendships.put(friendFrom, acceptanceStatus);
-//                },
-//                id);
-//        jdbc.query(GET_FRENDTO_QUERY,
-//                (rs) -> {
-//                    int friendFrom = rs.getInt("friendFrom");
-//                    FriendshipStatus acceptanceStatus = FriendshipStatus.valueOf(
-//                            rs.getString("acceptanceStatus"));
-//                    friendships.put(friendFrom, acceptanceStatus);
-//                },
-//                id);
         User user = optUser.get();
         user.setFriends(this.getUserFriends(user.getId()));
-//        user.setFriendshipStatuses(friendships);
         return Optional.of(user);
     }
 
