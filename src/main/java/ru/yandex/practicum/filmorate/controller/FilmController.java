@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -33,10 +32,10 @@ public class FilmController {
         return this.filmService.getTopLikedFilms(count);
     }
 
-    @GetMapping("/{genreId}")
+    @GetMapping("/{filmId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<FilmDto> getFilmsWithGenre(@PathVariable int genreId) {
-        return this.filmService.getFilmsWithGenre(genreId);
+    public FilmDto getFilmById(@PathVariable int filmId) {
+        return this.filmService.getFilmById(filmId);
     }
 
     @PostMapping

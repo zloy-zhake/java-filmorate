@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilmMapper {
-    public static Film mapToFilm (NewFilmRequest request) {
+    public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film();
         film.setName(request.getName());
         film.setDescription(request.getDescription());

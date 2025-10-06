@@ -11,13 +11,13 @@ import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +50,14 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(newFilm);
     }
 
+    public FilmDto getFilmById(int filmId) {
+        Optional<Film> optFilm = filmStorage.getFilmById(filmId);
+        if (optFilm.isEmpty()) {
+            throw new NoSuchElementException("Фильма с ID=" + filmId + "нет в БД.");
+        }
+        return FilmMapper.mapToFilmDto(optFilm.get());
+    }
+
     public FilmDto updateFilm(UpdateFilmRequest updateFilmRequest) {
         Film updatedFilm = filmStorage.getFilmById(updateFilmRequest.getId())
                 .map(film -> FilmMapper.updateFilmFields(film, updateFilmRequest))
@@ -74,12 +82,6 @@ public class FilmService {
         }
         return filmStorage.getTopLikedFilmIds(count).stream()
                 .map(filmId -> filmStorage.getFilmById(filmId).get())
-                .map(FilmMapper::mapToFilmDto)
-                .toList();
-    }
-
-    public List<FilmDto> getFilmsWithGenre(int genreId) {
-        return filmStorage.getFilmsWithGenre(genreId).stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
@@ -112,15 +114,9 @@ public class FilmService {
                     "Продолжительность фильма должна быть положительным числом."
             );
         }
-        Map<String, Integer> mpaRatingItem = newFilmRequest.getMpa();
-        if (!filmStorage.mpaRatingExists(mpaRatingItem.get("id"))) {
-            throw new NoSuchElementException("В БД нет рейтинга MPA с ID=" + mpaRatingItem.get("id"));
-        }
-        List<Map<String, Integer>> genreItems = newFilmRequest.getGenres();
-        for (Map<String, Integer> genreItem : genreItems) {
-            if (!filmStorage.genreExists(genreItem.get("id"))) {
-                throw new NoSuchElementException("В БД нет жанра с ID=" + genreItem.get("id"));
-            }
+        Mpa mpaRating = newFilmRequest.getMpa();
+        if (!filmStorage.mpaRatingExists(mpaRating.getId())) {
+            throw new NoSuchElementException("В БД нет рейтинга MPA с ID=" + mpaRating.getId());
         }
     }
 }

@@ -1,15 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Data
 public class Film {
@@ -18,36 +12,6 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
-//    FIXME
-    private Set<User> usersWhoLiked;
-    private List<Map<String, Integer>> genres;
-    private Map<String, Integer> mpa;
-
-    // FIXME Попробуй конструктор без параметров
-//    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//        this.usersWhoLiked = new HashSet<>();
-//    }
-
-//    public void addLike(User user) {
-//        if (user == null) {
-//            throw new UserValidationException("Пользователь не может быть null.");
-//        }
-//        this.usersWhoLiked.add(user);
-//    }
-//
-//    public void removeLike(User user) {
-//        if (user == null) {
-//            throw new UserValidationException("Пользователь не может быть null.");
-//        }
-//        this.usersWhoLiked.remove(user);
-//    }
-//
-//    public int getNumberOfLikes() {
-//        return this.usersWhoLiked.size();
-//    }
+    private List<Genre> genres;
+    private Mpa mpa;
 }

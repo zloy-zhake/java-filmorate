@@ -1,15 +1,15 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
@@ -37,8 +37,12 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
             "SELECT * from films WHERE id = ?;";
     private static final String GET_MPA_RATING_BY_FILM_ID =
             "SELECT ratingId from filmsMpaRatings WHERE filmId = ?;";
+    private static final String GET_MPA_RATING_BY_ID =
+            "SELECT rating from MpaRatings WHERE id = ?;";
     private static final String GET_GENRES_BY_FILM_ID =
             "SELECT genreId from filmsGenres WHERE filmId = ?;";
+    private static final String GET_GENRES_BY_ID =
+            "SELECT genre from genres WHERE id = ?;";
     private static final String UPDATE_FILM =
             "UPDATE films " +
                     "SET name = ?, description = ?, releaseDate = ?, duration = ? " +
@@ -62,11 +66,6 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
                     "GROUP BY filmId " +
                     "ORDER BY COUNT(*) DESC " +
                     "LIMIT ?;";
-    private static final String GET_FILMS_WITH_GENRE_ID =
-            "SELECT f.* " +
-                    "FROM films f " +
-                    "INNER JOIN filmsGenres fg ON f.id = fg.filmId " +
-                    "WHERE fg.genreId = ?;";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -82,12 +81,19 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
                 newFilm.getDuration()
         );
         newFilm.setId(filmId);
-        List<Map<String, Integer>> genres = newFilm.getGenres();
-        for (Map<String, Integer> genreItem : genres) {
-            insertWithoutGeneratedId(INSERT_GENRE_QUERY, filmId, genreItem.get("id"));
+        List<Genre> genres = new ArrayList<>();
+        if (newFilm.getGenres() != null) {
+            genres = new ArrayList<>(new LinkedHashSet<>(newFilm.getGenres()));
         }
-        int mpaRatingId = newFilm.getMpa().get("id");
-        insertWithoutGeneratedId(INSERT_MPA_QUERY, filmId, mpaRatingId);
+        if (!genres.isEmpty()) {
+            for (Genre genre : genres) {
+                if (!genreExists(genre.getId())) {
+                    throw new NoSuchElementException("Жанра с ID=" + genre.getId() + " нет в БД.");
+                }
+                insertWithoutGeneratedId(INSERT_GENRE_QUERY, filmId, genre.getId());
+            }
+        }
+        insertWithoutGeneratedId(INSERT_MPA_QUERY, filmId, newFilm.getMpa().getId());
         return newFilm;
     }
 
@@ -103,23 +109,25 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
         );
         update(
                 UPDATE_MPA_RATING,
-                updatedFilm.getMpa().get("id"),
+                updatedFilm.getMpa().getId(),
                 updatedFilm.getId()
         );
         int rowsDeleted = jdbc.update(DELETE_GENRES_BY_FILM_ID, updatedFilm.getId());
-        List<Map<String, Integer>> genres = updatedFilm.getGenres();
-        for (Map<String, Integer> genreItem : genres) {
-            insertWithoutGeneratedId(INSERT_GENRE_QUERY, updatedFilm.getId(), genreItem.get("id"));
+        List<Genre> genres = updatedFilm.getGenres();
+        for (Genre genre : genres) {
+            insertWithoutGeneratedId(INSERT_GENRE_QUERY, updatedFilm.getId(), genre.getId());
         }
         return updatedFilm;
     }
 
     @Override
     public List<Film> getAllFilms() {
-        return findMany(GET_ALL_FILMS).stream()
-                .peek(film -> film.setMpa(getFilmMpaRating(film.getId())))
-                .peek(film -> film.setGenres(getFilmGenres(film.getId())))
-                .toList();
+        List<Film> films = findMany(GET_ALL_FILMS);
+        for (Film film : films) {
+            film.setMpa(getFilmMpaRating(film.getId()));
+            film.setGenres(getFilmGenres(film.getId()));
+        }
+        return films;
     }
 
     @Override
@@ -167,24 +175,35 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
         return jdbc.queryForList(GET_TOP_LIKED_FILMS, Integer.class, count);
     }
 
-    public List<Film> getFilmsWithGenre(int genreId) {
-        return findMany(GET_FILMS_WITH_GENRE_ID, genreId).stream()
-                .peek(film -> film.setMpa(getFilmMpaRating(film.getId())))
-                .peek(film -> film.setGenres(getFilmGenres(film.getId())))
-                .toList();
-    }
-
-    private Map<String, Integer> getFilmMpaRating(int filmId) {
-        int mpaRating = jdbc.queryForObject(GET_MPA_RATING_BY_FILM_ID, Integer.class, filmId);
-        return Map.of("id", mpaRating);
-    }
-
-    private List<Map<String, Integer>> getFilmGenres(int filmId) {
-        List<Integer> genreIds = jdbc.queryForList(GET_GENRES_BY_FILM_ID, Integer.class, filmId);
-        List<Map<String, Integer>> genreItems = new ArrayList<>();
-        for (int genreId : genreIds) {
-            genreItems.add(Map.of("id", genreId));
+    private Mpa getFilmMpaRating(int filmId) {
+        int mpaRatingId;
+        try {
+            mpaRatingId = jdbc.queryForObject(GET_MPA_RATING_BY_FILM_ID, Integer.class, filmId);
+        } catch (DataAccessException e) {
+            return null;
         }
-        return genreItems;
+        String mpaRatingName = jdbc.queryForObject(GET_MPA_RATING_BY_ID, String.class, mpaRatingId);
+        Mpa mpa = new Mpa();
+        mpa.setId(mpaRatingId);
+        mpa.setName(mpaRatingName);
+        return mpa;
+    }
+
+    private List<Genre> getFilmGenres(int filmId) {
+        List<Integer> genreIds;
+        try {
+            genreIds = jdbc.queryForList(GET_GENRES_BY_FILM_ID, Integer.class, filmId);
+        } catch (DataAccessException e) {
+            return null;
+        }
+        List<Genre> genres = new ArrayList<>();
+        for (int genreId : genreIds) {
+            Genre genre = new Genre();
+            genre.setId(genreId);
+            String genreName = jdbc.queryForObject(GET_GENRES_BY_ID, String.class, genreId);
+            genre.setName(genreName);
+            genres.add(genre);
+        }
+        return genres;
     }
 }

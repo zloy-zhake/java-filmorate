@@ -60,7 +60,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int user1id, int user2id) { }
+    public void addFriend(int user1id, int user2id) {
+    }
 
     @Override
     public List<User> getUserFriends(int userId) {
@@ -68,7 +69,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void removeFriend(int userId, int friendId) {}
+    public void removeFriend(int userId, int friendId) {
+    }
 
     private int getNextId() {
         int nextId = this.getCurrentId() + 1;

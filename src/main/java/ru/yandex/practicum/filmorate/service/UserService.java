@@ -105,10 +105,6 @@ public class UserService {
         return new ArrayList<>(user1Friends);
     }
 
-//    public User getUserById(int id) {
-//        return this.userStorage.getUserById(id);
-//    }
-
     // Метод возвращает объект User, потому что в процессе валидации объект может измениться
     private NewUserRequest validateNewUserRequest(NewUserRequest request) throws UserValidationException {
         if (request.getEmail() == null || request.getEmail().isBlank()) {

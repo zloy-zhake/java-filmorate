@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
@@ -15,10 +15,6 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     private static final String GET_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
     private static final String GET_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
     private static final String GET_BY_LOGIN_QUERY = "SELECT * FROM users WHERE login = ?";
-//    private static final String GET_FRENDFROM_QUERY =
-//            "SELECT friendFrom, acceptanceStatus FROM friendships WHERE friendTo = ?";
-//    private static final String GET_FRENDTO_QUERY =
-//            "SELECT friendTo, acceptanceStatus FROM friendships WHERE friendFrom = ?";
     private static final String UPDATE_QUERY =
             "UPDATE users " +
                     "SET email = ?, login = ?, name = ?, birthday = ? " +
@@ -110,6 +106,6 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        int rowsDeleted =  jdbc.update(REMOVE_FRIEND_QUERY, userId, friendId);
+        int rowsDeleted = jdbc.update(REMOVE_FRIEND_QUERY, userId, friendId);
     }
 }

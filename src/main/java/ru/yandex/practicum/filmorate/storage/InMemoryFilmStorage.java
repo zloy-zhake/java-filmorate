@@ -105,21 +105,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLike(int userId, int filmId) {
-
     }
 
     @Override
     public void removeLike(int userId, int filmId) {
-
     }
 
     @Override
     public List<Integer> getTopLikedFilmIds(int count) {
-        return List.of();
-    }
-
-    @Override
-    public List<Film> getFilmsWithGenre(int genreId) {
         return List.of();
     }
 }

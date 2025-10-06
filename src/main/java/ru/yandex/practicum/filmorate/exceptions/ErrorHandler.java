@@ -41,7 +41,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleDuplicatedDataException(final DuplicatedDataException e) {
         return new ErrorResponse("Ошибка дублирования данных", e.getMessage());
     }
