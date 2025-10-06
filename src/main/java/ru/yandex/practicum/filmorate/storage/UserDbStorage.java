@@ -103,7 +103,9 @@ public class UserDbStorage extends BaseBdStorage<User> implements UserStorage {
     @Override
     public List<User> getUserFriends(int userId) {
         List<Integer> friendIds = jdbc.queryForList(GET_USER_FRIENDS_QUERY, Integer.class, userId);
-        return friendIds.stream().map(id -> getUserById(id).get()).toList();
+        return friendIds.stream()
+                .map(id -> getUserById(id).get())
+                .toList();
     }
 
     @Override

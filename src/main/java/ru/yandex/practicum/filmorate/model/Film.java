@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -16,9 +18,10 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+//    FIXME
     private Set<User> usersWhoLiked;
-    private Set<String> genres;
-    private MpaRating mpaRating;
+    private List<Map<String, Integer>> genres;
+    private Map<String, Integer> mpa;
 
     // FIXME Попробуй конструктор без параметров
 //    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
