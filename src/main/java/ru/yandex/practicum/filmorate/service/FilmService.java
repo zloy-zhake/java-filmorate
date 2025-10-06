@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -114,9 +115,19 @@ public class FilmService {
                     "Продолжительность фильма должна быть положительным числом."
             );
         }
-        Mpa mpaRating = newFilmRequest.getMpa();
-        if (!filmStorage.mpaRatingExists(mpaRating.getId())) {
-            throw new NoSuchElementException("В БД нет рейтинга MPA с ID=" + mpaRating.getId());
+        if (newFilmRequest.getMpa() != null) {
+            Mpa mpaRating = newFilmRequest.getMpa();
+            if (!filmStorage.mpaRatingExists(mpaRating.getId())) {
+                throw new NoSuchElementException("В БД нет рейтинга MPA с ID=" + mpaRating.getId());
+            }
+        }
+        if (newFilmRequest.getGenres() != null) {
+            List<Genre> genres = newFilmRequest.getGenres();
+            for (Genre genre : genres) {
+                if (!filmStorage.genreExists(genre.getId())) {
+                    throw new NoSuchElementException("В БД нет жанра с ID=" + genre.getId());
+                }
+            }
         }
     }
 }

@@ -93,7 +93,9 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
                 insertWithoutGeneratedId(INSERT_GENRE_QUERY, filmId, genre.getId());
             }
         }
-        insertWithoutGeneratedId(INSERT_MPA_QUERY, filmId, newFilm.getMpa().getId());
+        if (newFilm.getMpa() != null) {
+            insertWithoutGeneratedId(INSERT_MPA_QUERY, filmId, newFilm.getMpa().getId());
+        }
         return newFilm;
     }
 
@@ -107,15 +109,19 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
                 updatedFilm.getDuration(),
                 updatedFilm.getId()
         );
-        update(
-                UPDATE_MPA_RATING,
-                updatedFilm.getMpa().getId(),
-                updatedFilm.getId()
-        );
-        int rowsDeleted = jdbc.update(DELETE_GENRES_BY_FILM_ID, updatedFilm.getId());
-        List<Genre> genres = updatedFilm.getGenres();
-        for (Genre genre : genres) {
-            insertWithoutGeneratedId(INSERT_GENRE_QUERY, updatedFilm.getId(), genre.getId());
+        if (updatedFilm.getMpa() != null) {
+            update(
+                    UPDATE_MPA_RATING,
+                    updatedFilm.getMpa().getId(),
+                    updatedFilm.getId()
+            );
+        }
+        if (updatedFilm.getGenres() != null) {
+            int rowsDeleted = jdbc.update(DELETE_GENRES_BY_FILM_ID, updatedFilm.getId());
+            List<Genre> genres = updatedFilm.getGenres();
+            for (Genre genre : genres) {
+                insertWithoutGeneratedId(INSERT_GENRE_QUERY, updatedFilm.getId(), genre.getId());
+            }
         }
         return updatedFilm;
     }
