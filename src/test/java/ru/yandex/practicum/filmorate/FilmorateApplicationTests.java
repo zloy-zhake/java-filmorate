@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({UserDbStorage.class, UserRowMapper.class})
-class FilmoRateApplicationTests {
+class FilmorateApplicationTests {
     private final UserDbStorage userStorage;
 
 }
