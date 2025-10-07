@@ -85,14 +85,16 @@ public class FilmDbStorage extends BaseBdStorage<Film> implements FilmStorage {
         if (newFilm.getGenres() != null) {
             genres = new ArrayList<>(new LinkedHashSet<>(newFilm.getGenres()));
         }
+        List<Object[]> batchedFilmIdGenreIds = new ArrayList<>();
         if (!genres.isEmpty()) {
             for (Genre genre : genres) {
                 if (!genreExists(genre.getId())) {
                     throw new NoSuchElementException("Жанра с ID=" + genre.getId() + " нет в БД.");
                 }
-                insertWithoutGeneratedId(INSERT_GENRE_QUERY, filmId, genre.getId());
+                batchedFilmIdGenreIds.add(new Object[]{filmId, genre.getId()});
             }
         }
+        jdbc.batchUpdate(INSERT_GENRE_QUERY, batchedFilmIdGenreIds);
         if (newFilm.getMpa() != null) {
             insertWithoutGeneratedId(INSERT_MPA_QUERY, filmId, newFilm.getMpa().getId());
         }
