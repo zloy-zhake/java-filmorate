@@ -43,9 +43,11 @@ public class FilmService {
 
     public FilmDto addFilm(NewFilmRequest newFilmRequest) {
         validateNewFilmRequest(newFilmRequest);
-        if (filmStorage.filmExists(newFilmRequest.getName(), newFilmRequest.getReleaseDate(), newFilmRequest.getDuration())) {
-            throw new DuplicatedDataException("Данный фильм уже имется в БД: " + newFilmRequest);
-        }
+//        Даная проверка вызывает ошибку в тестах постмана.
+//        Имхо, очень странное решение со стороны автора тестов.
+//        if (filmStorage.filmExists(newFilmRequest.getName(), newFilmRequest.getReleaseDate(), newFilmRequest.getDuration())) {
+//            throw new DuplicatedDataException("Данный фильм уже имется в БД: " + newFilmRequest);
+//        }
         Film newFilm = FilmMapper.mapToFilm(newFilmRequest);
         newFilm = filmStorage.addFilm(newFilm);
         return FilmMapper.mapToFilmDto(newFilm);
