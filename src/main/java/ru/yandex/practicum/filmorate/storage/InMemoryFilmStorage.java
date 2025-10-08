@@ -44,12 +44,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         return new ArrayList<>(this.films.values());
     }
 
-    public Film getFilmById(int id) throws NoSuchElementException {
+    public Optional<Film> getFilmById(int id) throws NoSuchElementException {
         Film film = this.films.get(id);
         if (film == null) {
             throw new NoSuchElementException("Фильма с id=" + id + " не существует.");
         }
-        return film;
+        return Optional.of(film);
     }
 
     private int getNextId() {
@@ -86,5 +86,33 @@ public class InMemoryFilmStorage implements FilmStorage {
                     "Продолжительность фильма должна быть положительным числом."
             );
         }
+    }
+
+    @Override
+    public boolean filmExists(String name, LocalDate releaseDate, int duration) {
+        return false;
+    }
+
+    @Override
+    public boolean mpaRatingExists(int ratingId) {
+        return false;
+    }
+
+    @Override
+    public boolean genreExists(int genreId) {
+        return false;
+    }
+
+    @Override
+    public void addLike(int userId, int filmId) {
+    }
+
+    @Override
+    public void removeLike(int userId, int filmId) {
+    }
+
+    @Override
+    public List<Integer> getTopLikedFilmIds(int count) {
+        return List.of();
     }
 }

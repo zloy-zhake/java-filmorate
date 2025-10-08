@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.config.AppConfig;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
@@ -22,15 +22,14 @@ public class FilmValidationTests {
     AppConfig appConfig;
     FilmService filmService;
     FilmController filmController;
-    Film testFilm;
+    NewFilmRequest testFilm;
 
     @BeforeEach
     void setUp() {
         filmStorage = new InMemoryFilmStorage();
-        filmService = new FilmService(appConfig, filmStorage, userStorage);
+        filmService = new FilmService(appConfig, filmStorage);
         filmController = new FilmController(filmService);
-        testFilm = new Film(0, "", "", LocalDate.of(2000, 1, 1), 0);
-        testFilm.setId(1);
+        testFilm = new NewFilmRequest();
         testFilm.setName("Name");
         testFilm.setDescription("Description");
         testFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
